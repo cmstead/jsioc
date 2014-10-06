@@ -1,6 +1,6 @@
 {
-  "name": "JSTemplate",
-  "description": "Template project to simplify JS environment setup.",
+  "name": "jsioc",
+  "description": "A flexible IoC container for Javascript.",
   "version": "1.0.0",
   "devDependencies": {
     "grunt": "^0.4.5",
