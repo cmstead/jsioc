@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Jsioc : A flexible IoC container for Javascript">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Jsioc</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/cmstead/jsioc">View on GitHub</a>
+
+          <h1 id="project_title">Jsioc</h1>
+          <h2 id="project_tagline">A flexible IoC container for Javascript</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/cmstead/jsioc/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/cmstead/jsioc/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="jsioc" class="anchor" href="#jsioc"><span class="octicon octicon-link"></span></a>JSIoC</h1>
+
+<p>JSIoC is an Inversion of Control container for Javascript.  It was built after looking at various Javascript implementations of systems and frameworks, especially Backbone.  There is nothing inherently wrong with any of the systems, but building on top of systems without any means for dependency injection makes testing a challenge.</p>
+
+<p>Reviewing other IoC containers for Javascript revealed a series of implementation based around service locators or over-complicated definitions and configurations.  JSIoC is intended to be flexible, lightly opinionated and easy to use.</p>
+
+<p>Here's a rundown of what JSIoC offers:</p>
+
+<ul>
+<li>Static handling of your IoC container</li>
+<li>Constructor injection of instantiated dependencies</li>
+<li>Invocation of functions taking dependency arguments (useful for wrapping objects in systems not supporting DI</li>
+<li>Locator pattern implementation for absolutely no-other-way circumstances and test setup</li>
+<li>Easy decoupling of objects and their dependencies</li>
+<li>A general sense of peace and wellbeing</li>
+</ul><p>Here's what it looks like to instantiate the IoC container:</p>
+
+<pre><code>var container = jsioc.getContainer();
+
+//Program logic here ...
+</code></pre>
+
+<p>Here's what it looks like to get an existing IoC container:</p>
+
+<pre><code>var container = jsioc.getContainer();
+
+//Program logic here ...
+</code></pre>
+
+<p>Really, what's happening here is getContainer checks to see if a container exists.  If it does, the container is returned.  If no container exists, one is created and returned.  No fuss, no muss.</p>
+
+<p>Here's what it looks like when you register a object definition:</p>
+
+<pre><code>function MyObject(){
+    //constructor logic here
+}
+
+MyObject.prototype = {
+    //Prototypal properties here
+};
+
+container.register("MyObject", MyObject);
+</code></pre>
+
+<p>Once your object is defined, this is what it looks like to instantiate a new object with a dependency on MyObject:</p>
+
+<pre><code>function MyOtherObject(myObj){
+    this.myObj = myObj;
+}
+
+MyOtherObject.prototype = {
+    //Prototypal properties here
+};
+
+container.construct(MyOtherObject, ["MyObject"]);
+</code></pre>
+
+<p>Here's an invocation with dependencies:</p>
+
+<pre><code>function myInstantiator(myObj){
+    return new MyOtherObject(myObj);
+}
+
+container.invoke(myInstantiator, ["MyObject"]);
+</code></pre>
+
+<p>Finally, this is the locator pattern:</p>
+
+<pre><code>var myObj = container.locate("MyObject");
+</code></pre>
+
+<p>Simple, right?  This easy to use little container will make your testing so much easier and break hard dependencies that can make SOLID development tough.  Give it a try.</p>
+
+<p>Licensed under COMMON DEVELOPMENT AND DISTRIBUTION LICENSE Version 1.0 (CDDL-1.0)</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Jsioc maintained by <a href="https://github.com/cmstead">cmstead</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
