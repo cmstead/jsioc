@@ -65,3 +65,5 @@ Finally, this is the locator pattern:
     var myObj = container.locate("MyObject");
 
 Simple, right?  This easy to use little container will make your testing so much easier and break hard dependencies that can make SOLID development tough.  Give it a try.
+
+Licensed under COMMON DEVELOPMENT AND DISTRIBUTION LICENSE Version 1.0 (CDDL-1.0)
