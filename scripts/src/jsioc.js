@@ -6,16 +6,6 @@ var jsioc;
     var jsiocData = {};
 
     //Utility functions for object creation and dependency handling
-    function copyPrototype(newPrototype, baseObj){
-        var key;
-
-        for(key in baseObj.prototype){
-            newPrototype[key] = baseObj.prototype[key];
-        }
-
-        return newPrototype;
-    }
-
     function getDependencies(container, dependencies){
         var returnedDependencies = [],
             sanitizedDependencies = (dependencies) ? dependencies : [];
@@ -32,7 +22,7 @@ var jsioc;
             baseObject.apply(this, deps);
         }
 
-        FinalObject.prototype = copyPrototype(FinalObject.prototype, baseObject);
+        FinalObject.prototype = Object.create(baseObject.prototype);
         FinalObject.prototype.constructor = FinalObject;
 
         return FinalObject;

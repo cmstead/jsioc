@@ -78,13 +78,13 @@ describe('jsioc', function(){
             it('should return an object', function(){
                 var returnedObject = container.locate('TestObject');
 
-                expect(typeof returnedObject).toBe("object");
+                expect(returnedObject instanceof TestObject).toBe(true);
             });
 
             it('should return an an object with dependencies passed in', function(){
                 var returnedObject = container.locate('SecondObject');
 
-                expect(typeof returnedObject.testObj).toBe("object");
+                expect(returnedObject.testObj instanceof TestObject).toBe(true);
             });
 
         });
@@ -101,7 +101,7 @@ describe('jsioc', function(){
 
                 var returnedObject = container.construct(MyObject);
 
-                expect(typeof returnedObject).toBe('object');
+                expect(returnedObject instanceof MyObject).toBe(true);
             });
 
             it('should return a new object with prototypal properties attached', function(){
