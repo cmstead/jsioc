@@ -1,6 +1,5 @@
-var jsioc;
+var jsioc = (function(){
 
-(function(){
     'use strict';
 
     var jsiocData = {};
@@ -28,6 +27,27 @@ var jsioc;
         return FinalObject;
     }
 
+    function getDependency(container, key){
+        var dependency = container.registeredObjects[key],
+            isService = false;
+
+        if(!dependency){
+            dependency = container.registeredServices[key];
+            isService = true;
+        }
+
+        return {dependency: dependency, isService: isService };
+    }
+
+    function buildDependencyList(dependency){
+        var obj = (dependency) ? dependency : { dependencies: [] },
+            dependencyList = (obj.prototype) ?
+                obj.prototype.dependencies :
+                obj.dependencies;
+
+        return (dependencyList) ? dependencyList : [];
+    }
+
     /**
      * @constructor Container
      */
@@ -35,6 +55,7 @@ var jsioc;
 
     Container.prototype = {
         registeredObjects: {},
+        registeredServices: {},
 
         /**
          * @method construct
@@ -62,7 +83,7 @@ var jsioc;
          */
         invoke: function(userFn, dependencies){
             var returnedDependencies = getDependencies(this, dependencies);
-            userFn.apply(null, returnedDependencies);
+            return userFn.apply(null, returnedDependencies);
         },
 
         /**
@@ -74,11 +95,19 @@ var jsioc;
          * @returns {FinalObject}
          */
         locate: function(key){
-            var locatedObject = this.registeredObjects[key],
-                FinalObject = buildObject(locatedObject),
-                returnedDependencies = getDependencies(this, locatedObject.prototype.dependencies);
+            var locatorObject = getDependency(this, key),
+                isService = locatorObject.isService,
+                dependency = locatorObject.dependency,
+                dependencyList = buildDependencyList(dependency),
+                returnedDependencies = getDependencies(this, dependencyList),
 
-            return new FinalObject(returnedDependencies);
+                FinalObject = (isService) ?
+                    dependency :
+                    buildObject(dependency);
+
+            return (isService) ?
+                dependency :
+                new FinalObject(returnedDependencies);
         },
 
         /**
@@ -94,10 +123,28 @@ var jsioc;
                 throw new Error('Cannot reregister key: ', key);
             }
             this.registeredObjects[key] = obj;
+        },
+
+        /**
+         * @method service
+         * @memberof Container
+         * @param {string} key
+         * @param {object} obj
+         */
+        service: function(key, service){
+            var dependencyList = (service.prototype) ?
+                service.prototype.dependencies :
+                [];
+
+            if(this.registeredServices[key]){
+                throw new Error('Cannot reregister key: ', key);
+            }
+
+            this.registeredServices[key] = this.invoke(service, dependencyList);
         }
     };
 
-    jsioc = {
+    return {
 
         /**
          * @function getContainer

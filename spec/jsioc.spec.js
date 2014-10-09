@@ -22,11 +22,19 @@ describe('jsioc', function(){
 
         var container,
             TestObject,
-            SecondObject;
+            SecondObject,
+            TestService;
 
         beforeEach(function(){
+            var serviceOutput = {
+                testmethod: function(){
+                    //noop
+                }
+            };
+
             container = jsioc.getContainer();
             container.registeredObjects = {};
+            container.registeredServices = {};
 
             function TestObjectParent(){}
             TestObjectParent.prototype = {
@@ -35,14 +43,21 @@ describe('jsioc', function(){
 
             TestObject = TestObjectParent;
 
-            function SecondObjectParent(testObj){
+            function SecondObjectParent(testObj, testService){
                 this.testObj = testObj;
+                this.testService = testService;
             }
 
             SecondObjectParent.prototype = {};
-            SecondObjectParent.prototype.dependencies = ['TestObject'];
+            SecondObjectParent.prototype.dependencies = ['TestObject', 'TestService'];
 
             SecondObject = SecondObjectParent;
+
+            function TestServiceParent(){
+                return serviceOutput;
+            }
+
+            TestService = TestServiceParent;
         });
 
         describe('register', function(){
@@ -69,10 +84,33 @@ describe('jsioc', function(){
 
         });
 
+        describe('service', function(){
+            it('should register a service to a key', function(){
+                container.service('TestService', TestService);
+
+                expect(container.registeredServices.TestService).toBe(TestService());
+            });
+
+            it('should throw an error if key is already registered', function(){
+                var errorThrown = false;
+
+                container.service('TestService', TestService);
+
+                try{
+                    container.service('TestService', {});
+                } catch (error){
+                    errorThrown = true;
+                }
+
+                expect(errorThrown).toBe(true);
+            });
+        });
+
         describe('locate', function(){
             beforeEach(function(){
                 container.register('TestObject', TestObject);
                 container.register('SecondObject', SecondObject);
+                container.service('TestService', TestService);
             });
 
             it('should return an object', function(){
@@ -85,6 +123,12 @@ describe('jsioc', function(){
                 var returnedObject = container.locate('SecondObject');
 
                 expect(returnedObject.testObj instanceof TestObject).toBe(true);
+            });
+
+            it('should return an an object with service dependencies passed in', function(){
+                var returnedObject = container.locate('SecondObject');
+
+                expect(returnedObject.testService).toBe(TestService());
             });
 
         });
